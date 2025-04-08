@@ -2,22 +2,10 @@ import { client } from '../../api/client'
 
 const initialState = []
 
-function nextTodoId(todos) {
-  const maxId = todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1)
-  return maxId + 1
-}
-
 export default function todosReducer(state = initialState, action) {
   switch (action.type) {
     case 'todos/todoAdded': {
-      return [
-        ...state,
-        {
-          id: nextTodoId(state),
-          text: action.payload,
-          completed: false,
-        },
-      ]
+      return [...state, action.payload]
     }
     case 'todos/todoToggled': {
       return state.map((todo) => {
@@ -76,5 +64,13 @@ export async function fetchTodos(dispatch, getState) {
     console.log('Todos after dispatch: ', stateAfter.todos.length)
   } catch (e) {
     console.error(e)
+  }
+}
+
+export function saveNewTodo(text) {
+  return async function saveNewTodoThunk(dispatch, getState) {
+    const initialTodo = { text }
+    const response = await client.post('/fakeApi/todos', { todo: initialTodo })
+    dispatch({ type: 'todos/todoAdded', payload: response.todo })
   }
 }
