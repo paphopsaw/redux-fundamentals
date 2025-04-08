@@ -2,23 +2,32 @@ import { client } from '../../api/client'
 import { createSelector } from 'reselect'
 import { StatusFilters } from '../filters/filtersSlice'
 
-const initialState = []
+const initialState = {
+  status: 'idle', // or: 'loading', 'succeeded', 'failed'
+  entities: [],
+}
 
 export default function todosReducer(state = initialState, action) {
   switch (action.type) {
     case 'todos/todoAdded': {
-      return [...state, action.payload]
+      return {
+        ...state,
+        entities: [...state.entities, action.payload],
+      }
     }
     case 'todos/todoToggled': {
-      return state.map((todo) => {
-        if (todo.id !== action.payload) {
-          return todo
-        }
-        return {
-          ...todo,
-          completed: !todo.completed,
-        }
-      })
+      return {
+        ...state,
+        entities: state.entities.map((todo) => {
+          if (todo.id !== action.payload) {
+            return todo
+          }
+          return {
+            ...todo,
+            completed: !todo.completed,
+          }
+        }),
+      }
     }
     case 'todos/colorSelected': {
       const { color, todoId } = action.payload
@@ -45,11 +54,27 @@ export default function todosReducer(state = initialState, action) {
     case 'todos/completedCleared': {
       return state.filter((todo) => !todo.completed)
     }
+    case 'todos/todosLoading': {
+      return {
+        ...state,
+        status: 'loading',
+      }
+    }
     case 'todos/todosLoaded': {
-      return action.payload
+      return {
+        ...state,
+        status: 'loaded',
+        entities: action.payload,
+      }
     }
     default:
       return state
+  }
+}
+
+export const todosLoading = () => {
+  return {
+    type: 'todos/todosLoading',
   }
 }
 
@@ -62,6 +87,7 @@ export const todosLoaded = (todos) => {
 
 export async function fetchTodos(dispatch, getState) {
   try {
+    dispatch(todosLoading())
     const response = await client.get('/fakeApi/todos')
 
     const stateBefore = getState()
@@ -91,15 +117,11 @@ export function saveNewTodo(text) {
   }
 }
 
-export const selectTodos = (state) => state.todos
+export const selectTodos = (state) => state.todos.entities
 
 export const selectTodoById = (state, todoId) => {
-  return state.todos.find((todo) => todo.id === todoId)
+  return state.todos.entities.find((todo) => todo.id === todoId)
 }
-
-export const selectTodosIds = createSelector(selectTodos, (todos) =>
-  todos.map((todo) => todo.id)
-)
 
 export const selectFilteredTodos = createSelector(
   selectTodos,
@@ -125,3 +147,10 @@ export const selectFilteredTodoIds = createSelector(
   selectFilteredTodos,
   (filteredTodos) => filteredTodos.map((todo) => todo.id)
 )
+
+export const selectRemainingTodos = (state) => {
+  const uncompletedTodos = state.todos.entities.filter(
+    (todo) => !todo.completed
+  )
+  return uncompletedTodos.length
+}
