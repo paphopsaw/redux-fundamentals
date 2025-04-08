@@ -9,10 +9,6 @@ import store from './store'
 
 console.log('Initial state: ', store.getState())
 
-const unsubscribe = store.subscribe(() => {
-  console.log('State after dispatch', store.getState())
-})
-
 store.dispatch({ type: 'todos/todoAdded', payload: 'Learn about actions' })
 store.dispatch({ type: 'todos/todoAdded', payload: 'Learn about reducers' })
 store.dispatch({ type: 'todos/todoAdded', payload: 'Learn about stores' })
@@ -26,9 +22,6 @@ store.dispatch({
   type: 'filters/colorFilterChanged',
   payload: { color: 'red', changeType: 'added' },
 })
-
-// Stop listening to state updates
-unsubscribe()
 
 // Dispatch one more action to see what happens
 

@@ -4,7 +4,7 @@ export const sayHiOnDispatch = (createStore) => {
 
     function newDispatch(action) {
       const result = store.dispatch(action)
-      console.log('Hi!')
+      console.log(store.getState())
       return result
     }
 
