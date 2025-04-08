@@ -1,12 +1,16 @@
-import { createStore, compose } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
 import rootReducer from './reducer'
-import {
-  includeMeaningOfLife,
-  sayHiOnDispatch,
-} from './exampleAddons/enhancers'
 
-const composedEnhancer = compose(sayHiOnDispatch, includeMeaningOfLife)
+const delayedMessageMiddleware = (storeAPI) => (next) => (action) => {
+  if (action.type === 'todos/todoAdded') {
+    setTimeout(() => {
+      console.log('Add a new todo: ', action.payload)
+    }, 1000)
+  }
+}
 
-const store = createStore(rootReducer, undefined, composedEnhancer)
+const middlewareEnhancer = applyMiddleware(delayedMessageMiddleware)
+
+const store = createStore(rootReducer, middlewareEnhancer)
 
 export default store
