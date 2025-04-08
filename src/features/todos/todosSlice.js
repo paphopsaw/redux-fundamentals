@@ -183,7 +183,8 @@ export const selectFilteredTodoIds = createSelector(
 )
 
 export const selectRemainingTodos = (state) => {
-  const uncompletedTodos = state.todos.entities.filter(
+  console.log(state)
+  const uncompletedTodos = Object.values(state.todos.entities).filter(
     (todo) => !todo.completed
   )
   return uncompletedTodos.length
