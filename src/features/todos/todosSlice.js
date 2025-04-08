@@ -93,6 +93,10 @@ export function saveNewTodo(text) {
 
 export const selectTodos = (state) => state.todos
 
+export const selectTodoById = (state, todoId) => {
+  return state.todos.find((todo) => todo.id === todoId)
+}
+
 export const selectTodosIds = createSelector(selectTodos, (todos) =>
   todos.map((todo) => todo.id)
 )
