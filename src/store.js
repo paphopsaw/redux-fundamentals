@@ -1,16 +1,9 @@
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
+import { thunk } from 'redux-thunk'
 import rootReducer from './reducer'
 
-const delayedMessageMiddleware = (storeAPI) => (next) => (action) => {
-  if (action.type === 'todos/todoAdded') {
-    setTimeout(() => {
-      console.log('Add a new todo: ', action.payload)
-    }, 1000)
-  }
-}
+const composedEnhancer = compose(applyMiddleware(thunk))
 
-const middlewareEnhancer = applyMiddleware(delayedMessageMiddleware)
-
-const store = createStore(rootReducer, middlewareEnhancer)
+const store = createStore(rootReducer, composedEnhancer)
 
 export default store

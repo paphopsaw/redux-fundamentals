@@ -3,8 +3,13 @@ import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import './index.css'
 
+import './api/server'
+
 import App from './App'
 import store from './store'
+import { fetchTodos } from './features/todos/todosSlice'
+
+store.dispatch(fetchTodos)
 
 const root = createRoot(document.getElementById('root'))
 
